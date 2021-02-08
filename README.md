@@ -86,13 +86,13 @@ Let's examine an example workflow for:
 * storing the inferred predictions in the directory `PRED_DIR="../example_output/predictions_chd_ct"`, and
 * and converting to an STL file in `STL_DIR="../example_output/stl"`. 
 
-
-    #!/bin/bash
-    # Workflow
-    python train.py --base_data_dir $BASE_DATA_DIR --sub_data_dir $SUB_DATA_DIR --base_output_dir $BASE_OUTPUT_DIR \
-                --image_dir $IMAGE_DIR --mask_dir $MASK_DIR --model_in $MODEL_FILE --model_out $MODEL_FILE \
-                --network $NETWORK --n_epochs 10
-    python infer.py --model_path $MODEL_FILE --image_paths $IMAGE_INFERENCE_DIR --output_path $PRED_DIR
-    python ../src/utilities/png_to_mesh.py --init_slice 0 --final_slice 134 --aspect_ratio 2 \
-       --in_path $PRED_DIR --out_path $STL_DIR --out_fname model_chd_ct.stl --out_res 0 0 0
+```
+#!/bin/bash
+python train.py --base_data_dir $BASE_DATA_DIR --sub_data_dir $SUB_DATA_DIR --base_output_dir $BASE_OUTPUT_DIR \
+            --image_dir $IMAGE_DIR --mask_dir $MASK_DIR --model_in $MODEL_FILE --model_out $MODEL_FILE \
+            --network $NETWORK --n_epochs 10
+python infer.py --model_path $MODEL_FILE --image_paths $IMAGE_INFERENCE_DIR --output_path $PRED_DIR
+python ../src/utilities/png_to_mesh.py --init_slice 0 --final_slice 134 --aspect_ratio 2 \
+   --in_path $PRED_DIR --out_path $STL_DIR --out_fname model_chd_ct.stl --out_res 0 0 0
+```
 
