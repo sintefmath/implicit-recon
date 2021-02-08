@@ -86,6 +86,8 @@ Let's examine an example workflow for:
 * storing the inferred predictions in the directory `PRED_DIR="../example_output/predictions_chd_ct"`, and
 * and converting to an STL file in `STL_DIR="../example_output/stl"`. 
 
+With the above definitions, the following commands should then be run from the `example_runs` directory:
+
 ```
 #!/bin/bash
 python train.py --base_data_dir $BASE_DATA_DIR --sub_data_dir $SUB_DATA_DIR --base_output_dir $BASE_OUTPUT_DIR \
