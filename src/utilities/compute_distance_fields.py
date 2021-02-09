@@ -90,7 +90,7 @@ def save_array_as_image(arr, im_dir, im_id):
     imrange = max(arr.shape) // 4
     plt.imshow(arr, vmin=-imrange, vmax=imrange)
     plt.axis('off')
-    out_im = im_dir + f'{im_id:010d}.png'
+    out_im = im_dir / f'{im_id:010d}.png'
     plt.savefig(out_im)
     plt.clf()
 
@@ -109,7 +109,7 @@ def save_array_as_point_cloud_csv(arr, csv_dir, csv_id):
         for l in range(n):
             point_cloud[k * n + l] = k, l, arr[k, l]
 
-    out_file = csv_dir + f'{csv_id:010d}.csv'
+    out_file = csv_dir / f'{csv_id:010d}.csv'
     np.savetxt(out_file, point_cloud, delimiter=' ', fmt=['%d', '%d', '%f'])
 
 
@@ -139,26 +139,26 @@ def create_directories(config):
     os.mkdir(config.output_dir)
 
     for data_vol in config.val_test_train:
-        data_vol_dir = config.output_dir + data_vol + "/"
+        data_vol_dir = config.output_dir / data_vol
         os.mkdir(data_vol_dir)
 
         if config.single_slice_images:
-            os.mkdir(data_vol_dir + f"images_{config.out_res}/")
+            os.mkdir(data_vol_dir / f"images_{config.out_res}/")
         if config.three_slice_images:
-            os.mkdir(data_vol_dir + f"images_3_slice_{config.out_res}/")
+            os.mkdir(data_vol_dir / f"images_3_slice_{config.out_res}/")
         for mask_type in config.mask_types:
-            os.mkdir(data_vol_dir + mask_type + f"_masks_{config.out_res}/")
+            os.mkdir(data_vol_dir / Path(mask_type + f"_masks_{config.out_res}/"))
             if config.distance_fields_3d:
-                os.mkdir(data_vol_dir + mask_type + f"_3d_distances_{config.out_res}/")
+                os.mkdir(data_vol_dir / Path(mask_type + f"_3d_distances_{config.out_res}/"))
                 if config.save_distance_field_images:
-                    os.mkdir(data_vol_dir + mask_type + f"_3d_distance_images_{config.out_res}/")
+                    os.mkdir(data_vol_dir / Path(mask_type + f"_3d_distance_images_{config.out_res}/"))
 
-                os.mkdir(data_vol_dir + mask_type + f"_3d_spline_{config.out_res}/")
+                os.mkdir(data_vol_dir / Path(mask_type + f"_3d_spline_{config.out_res}/"))
             if config.distance_fields_2d:
-                os.mkdir(data_vol_dir + mask_type + f"_2d_distances_{config.out_res}/")
+                os.mkdir(data_vol_dir / Path(mask_type + f"_2d_distances_{config.out_res}/"))
                 if config.save_distance_field_images:
-                    os.mkdir(data_vol_dir + mask_type + f"_2d_distance_images_{config.out_res}/")
-                os.mkdir(data_vol_dir + mask_type + f"_2d_spline_{config.out_res}/")
+                    os.mkdir(data_vol_dir / Path(mask_type + f"_2d_distance_images_{config.out_res}/"))
+                os.mkdir(data_vol_dir / Path(mask_type + f"_2d_spline_{config.out_res}/"))
 
 
 def parse_arguments(args=None):
@@ -191,7 +191,8 @@ def parse_arguments(args=None):
 
     config = parser.parse_args(args)
 
-    config.output_dir = config.input_dir + f"output_{str(config.out_res)}/"
+    config.input_dir = Path(config.input_dir)
+    config.output_dir = config.input_dir / Path(f"output_{str(config.out_res)}/")
     config.val_test_train = {"train": config.train_idxs, "val": config.val_idxs, "test": config.test_idxs}
     config.resize = config.in_res != config.out_res
 
@@ -202,7 +203,7 @@ def main(config):
     create_directories(config)
 
     for data_vol in config.val_test_train:
-        data_vol_dir = config.output_dir + data_vol + "/"
+        data_vol_dir = config.output_dir / data_vol
 
         image_id = 0
         mask_id = 0
@@ -214,20 +215,20 @@ def main(config):
                 print("Processing " + mask_type)
 
                 # Redefine paths
-                mask_dir = data_vol_dir + mask_type + f"_masks_{config.out_res}/"
+                mask_dir = data_vol_dir / Path(mask_type + f"_masks_{config.out_res}/")
 
                 if config.distance_fields_2d:
-                    _2d_distance_dir = data_vol_dir + mask_type + f"_2d_distances_{config.out_res}/"
-                    _2d_distance_field_image_dir = data_vol_dir + mask_type + f"_2d_distance_images_{config.out_res}/"
+                    _2d_distance_dir = data_vol_dir / Path(mask_type + f"_2d_distances_{config.out_res}/")
+                    _2d_distance_field_image_dir = data_vol_dir / Path(mask_type + f"_2d_distance_images_{config.out_res}/")
 
                 if config.distance_fields_3d:
-                    _3d_distance_dir = data_vol_dir + mask_type + f"_3d_distances_{config.out_res}/"
-                    _3d_distance_field_image_dir = data_vol_dir + mask_type + f"_3d_distance_images_{config.out_res}/"
+                    _3d_distance_dir = data_vol_dir / Path(mask_type + f"_3d_distances_{config.out_res}/")
+                    _3d_distance_field_image_dir = data_vol_dir / Path(mask_type + f"_3d_distance_images_{config.out_res}/")
 
                 mask_id_tmp = mask_id
 
                 # Load mask
-                in_mask = config.input_dir + mask_type + "/" + mask_type + vol_idx_str + ".nii.gz"
+                in_mask = config.input_dir / Path(mask_type + "/" + mask_type + vol_idx_str + ".nii.gz")
                 mask_vol = nib.load(in_mask)
 
                 # Prepare and compute distances
@@ -253,7 +254,7 @@ def main(config):
                 for j in range(1, num_slices - 1):
                     # Output masks
                     mask = Image.fromarray(mask_array[:, :, j])
-                    out_mask = mask_dir + f'{mask_id_tmp:010d}.png'
+                    out_mask = mask_dir / f'{mask_id_tmp:010d}.png'
                     mask.save(out_mask)
 
                     # Output distance fields and images
@@ -275,13 +276,13 @@ def main(config):
             mask_id = mask_id_tmp
 
             # Load image and convert to uint8
-            in_img = config.input_dir + f"/IM52525/CTH0{vol_idx_str}_IMA.nii.gz"
+            in_img = config.input_dir / f"/IM52525/CTH0{vol_idx_str}_IMA.nii.gz"
             img_vol = nib.load(in_img).get_fdata()
             img_vol = np.uint8(np.clip(img_vol, 0, 2040) / 8)
 
             # Redefine paths
-            im_3_slice_dir = data_vol_dir + f"images_3_slice_{config.out_res}/"
-            im_dir = data_vol_dir + f"images_{config.out_res}/"
+            im_3_slice_dir = data_vol_dir / f"images_3_slice_{config.out_res}/"
+            im_dir = data_vol_dir / f"images_{config.out_res}/"
 
             # Output images
             num_slices = img_vol.shape[2]
@@ -292,7 +293,7 @@ def main(config):
                     if config.resize:
                         img3 = img3.resize((config.out_res, config.out_res))
 
-                    out_im3 = im_3_slice_dir + f'{image_id:010d}.png'
+                    out_im3 = im_3_slice_dir / f'{image_id:010d}.png'
                     img3.save(out_im3)
 
                 if config.single_slice_images:
@@ -301,7 +302,7 @@ def main(config):
                     if config.resize:
                         img = img.resize((config.out_res, config.out_res))
 
-                    out_im = im_dir + f'{image_id:010d}.png'
+                    out_im = im_dir / f'{image_id:010d}.png'
                     img.save(out_im)
 
                 image_id += 1
