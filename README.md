@@ -28,6 +28,8 @@ These can be installed (in your virtual environment) by running
 
     pip install -r requirements.txt
 
+__Note:__ If you experience compatibility issues with `torch` and `torchvision`, remove them from the `requirements.txt` and follow the instructions on https://pytorch.org/.
+
 ## Creating the data
 The Congenital Heart Disease (CHD) CT data-set was kindly made available to us by 
 Dr. Xiaowei Xu from the Department of Computer Science and Engineering,
