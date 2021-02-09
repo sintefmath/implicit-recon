@@ -309,6 +309,5 @@ def main(config):
 
 
 if __name__ == '__main__':
-    # config = parse_arguments(['--input_dir', "/home/georgm/Dropbox/Data/Projects/ANALYST/CHD_orig/"])
     config = parse_arguments()
     main(config)
