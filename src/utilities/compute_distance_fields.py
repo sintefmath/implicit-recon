@@ -174,18 +174,18 @@ def parse_arguments(args=None):
                         help='Indices of the volumes in the validation set')  # 43 removed
     parser.add_argument('--test_idxs', nargs='+', type=int, default=[2, 12, 18, 23, 25, 27, 40, 44, 48, 51, 53, 55, 57, 60],
                         help='Indices of the volumes in the test set')
-    parser.add_argument('--three_slice_images', dest='three_slice_images', default=True, action='store_true',
+    parser.add_argument('--three_slice_images', dest='three_slice_images', default=False, action='store_true',
                         help='Whether to take 3 consecutive slices at a time')
     parser.add_argument('--single_slice_images', dest='single_slice_images', default=True, action='store_true',
                         help='Whether to take 1 slice at a time')
-    parser.add_argument('--compute_3d_distance_fields', dest='distance_fields_3d', default=True, action='store_true',
+    parser.add_argument('--compute_3d_distance_fields', dest='distance_fields_3d', default=False, action='store_true',
                         help='Whether to compute distance fields to any voxel in the volume')
-    parser.add_argument('--compute_2d_distance_fields', dest='distance_fields_2d', default=True, action='store_true',
+    parser.add_argument('--compute_2d_distance_fields', dest='distance_fields_2d', default=False, action='store_true',
                         help='Whether to compute distance fields to any pixel in the current slice')
-    parser.add_argument('--save_distance_field_images', dest='save_distance_field_images', default=True,
+    parser.add_argument('--save_distance_field_images', dest='save_distance_field_images', default=False,
                         action='store_true')
     parser.add_argument('--in_res', default=512, type=int, help="Input resolution")
-    parser.add_argument('--out_res', default=128, type=int, help="Output resolution")
+    parser.add_argument('--out_res', default=512, type=int, help="Output resolution")
     parser.add_argument('--input_dir', default="./", type=str, help="Input path for image data")
     parser.add_argument('--mask_types', nargs='+', type=str, default=["BP", "MYO"], help="Mask types to process")
 
@@ -257,7 +257,7 @@ def main(config):
                     out_mask = mask_dir / f'{mask_id_tmp:010d}.png'
                     mask.save(out_mask)
 
-                    # Output distance fields and images
+                    # Output distance fields and images  TODO: These images have a white frame that should be removed.
                     if config.distance_fields_2d:
                         distance_2d = distances_2d[:, :, j]
                         save_array_as_point_cloud_csv(distance_2d, _2d_distance_dir, mask_id_tmp)
