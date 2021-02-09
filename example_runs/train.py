@@ -38,7 +38,7 @@ def parse_arguments(args=None):
     parser.add_argument('--code_size', default=8, type=int, help='Spatial dimension of the bottleneck layer in the U-Net')
     parser.add_argument('--degree', default=1, type=int, help='Degree of the splines')
     parser.add_argument('--input_res', default=512, type=int, help='Resolution of the input images')
-    parser.add_argument('--num_input_slices', default=1, type=int,
+    parser.add_argument('--num_input_slices', default=1, type=int, choices=[1, 3],
                         help='Input channel dimensions, i.e., number of input slices')
 
     # Paths
@@ -180,7 +180,7 @@ def validate(implicit_spline_net, col_mat, test_loader, scheduler, epoch, config
         return val_loss
 
 
-def train(implicit_spline_net, col_mat, train_loader, test_loader, optimizer, scheduler, config, summary_writer):
+def train(implicit_spline_net, col_mat, train_loader, val_loader, optimizer, scheduler, config, summary_writer):
     for epoch in range(config.init_epoch, config.init_epoch + config.n_epochs):
         print(f'\nEPOCH = {epoch} / {config.init_epoch + config.n_epochs}')
         for step, data in enumerate(tqdm.tqdm(train_loader, desc='Training epoch', leave=False)):
@@ -216,7 +216,7 @@ def train(implicit_spline_net, col_mat, train_loader, test_loader, optimizer, sc
 
             config.it_counter += 1
             if step == 0:
-                val_loss = validate(implicit_spline_net, col_mat, test_loader, scheduler, epoch, config, summary_writer)
+                val_loss = validate(implicit_spline_net, col_mat, val_loader, scheduler, epoch, config, summary_writer)
                 scheduler.step()  # scheduler.step(val_loss)  # scheduler.step(val_loss) with ReduceLROnPlateau
 
         if epoch % config.write_model_frequency == 0 or epoch == config.init_epoch + config.n_epochs - 1:
@@ -267,7 +267,7 @@ def main(config):
                                 img_dir=config.image_dir, mask_dir=config.mask_dir, output_size=config.input_res)
 
     train_loader = DataLoader(train_data, batch_size=config.batch_size, shuffle=True)
-    test_loader = DataLoader(val_data, batch_size=config.batch_size, shuffle=True)
+    val_loader = DataLoader(val_data, batch_size=config.batch_size, shuffle=True)
 
     optimizer = torch.optim.SGD(implicit_spline_net.parameters(), lr=config.learning_rate, momentum=0.9, nesterov=True)
 
@@ -278,7 +278,7 @@ def main(config):
     if torch.cuda.is_available():
         implicit_spline_net.cuda()
 
-    train(implicit_spline_net, col_mat, train_loader, test_loader, optimizer, scheduler, config, summary_writer)
+    train(implicit_spline_net, col_mat, train_loader, val_loader, optimizer, scheduler, config, summary_writer)
 
     summary_writer.close()
 

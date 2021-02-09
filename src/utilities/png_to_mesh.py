@@ -62,7 +62,7 @@ def reduce_images(fnames, div, config, z_stride=1):
 
 def main(config):
     fnames = os.listdir(config.in_path)
-    fnames = [fname for fname in fnames if fname.endswith("png") ]
+    fnames = [fname for fname in fnames if fname.endswith("png")]
     fnames.sort()
     final_slice = min(config.final_slice, len(fnames))
     fnames = fnames[config.init_slice:final_slice % len(fnames) + 1]
