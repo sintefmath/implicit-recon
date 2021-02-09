@@ -160,45 +160,49 @@ def create_directories(config):
                 os.mkdir(data_vol_dir + mask_type + f"_2d_spline_{config.out_res}/")
 
 
-# Parsing arguments
-parser = argparse.ArgumentParser(prog='compute_distance_fields', formatter_class=argparse.RawDescriptionHelpFormatter,
-                                 description="Extract single/three-channels images and masks, resize if desired, and "
-                                             "compute distance fields")
-parser.add_argument('--train_idxs', nargs='+', type=int,
-                    default=[1, 4, 5, 7, 9, 11, 13, 14, 15, 16, 19, 20, 21, 22, 24, 26, 28, 29, 30, 34, 35, 36, 37, 38,
-                             39, 41, 42, 46, 47, 49, 56, 58, 59, 61, 63, 64, 65, 66, 67],
-                    help='Indices of the volumes in the training set')  # 62 removed
-parser.add_argument('--val_idxs', nargs='+', type=int, default=[3, 6, 8, 10, 17, 31, 32, 33, 45, 50, 52, 54, 68],
-                    help='Indices of the volumes in the validation set')  # 43 removed
-parser.add_argument('--test_idxs', nargs='+', type=int, default=[2, 12, 18, 23, 25, 27, 40, 44, 48, 51, 53, 55, 57, 60],
-                    help='Indices of the volumes in the test set')
-parser.add_argument('--three_slice_images', dest='three_slice_images', default=True, action='store_true',
-                    help='Whether to take 3 consecutive slices at a time')
-parser.add_argument('--single_slice_images', dest='single_slice_images', default=True, action='store_true',
-                    help='Whether to take 1 slice at a time')
-parser.add_argument('--compute_3d_distance_fields', dest='distance_fields_3d', default=True, action='store_true',
-                    help='Whether to compute distance fields to any voxel in the volume')
-parser.add_argument('--compute_2d_distance_fields', dest='distance_fields_2d', default=True, action='store_true',
-                    help='Whether to compute distance fields to any pixel in the current slice')
-parser.add_argument('--save_distance_field_images', dest='save_distance_field_images', default=True,
-                    action='store_true')
-parser.add_argument('--in_res', default=512, type=int, help="Input resolution")
-parser.add_argument('--out_res', default=256, type=int, help="Output resolution")
-parser.add_argument('--input_dir', default="/home/georgm/Dropbox/Data/Projects/ANALYST/CHD_orig/", type=str,
-                    help="Input path for image data")
-parser.add_argument('--mask_types', nargs='+', type=str, default=["BP", "MYO"], help="Mask types to process")
+def parse_arguments(args=None):
+    # Parsing arguments
+    parser = argparse.ArgumentParser(prog='compute_distance_fields', formatter_class=argparse.RawDescriptionHelpFormatter,
+                                     description="Extract single/three-channels images and masks, resize if desired, and "
+                                                 "compute distance fields")
+    parser.add_argument('--train_idxs', nargs='+', type=int,
+                        default=[1, 4, 5, 7, 9, 11, 13, 14, 15, 16, 19, 20, 21, 22, 24, 26, 28, 29, 30, 34, 35, 36, 37, 38,
+                                 39, 41, 42, 46, 47, 49, 56, 58, 59, 61, 63, 64, 65, 66, 67],
+                        help='Indices of the volumes in the training set')  # 62 removed
+    parser.add_argument('--val_idxs', nargs='+', type=int, default=[3, 6, 8, 10, 17, 31, 32, 33, 45, 50, 52, 54, 68],
+                        help='Indices of the volumes in the validation set')  # 43 removed
+    parser.add_argument('--test_idxs', nargs='+', type=int, default=[2, 12, 18, 23, 25, 27, 40, 44, 48, 51, 53, 55, 57, 60],
+                        help='Indices of the volumes in the test set')
+    parser.add_argument('--three_slice_images', dest='three_slice_images', default=True, action='store_true',
+                        help='Whether to take 3 consecutive slices at a time')
+    parser.add_argument('--single_slice_images', dest='single_slice_images', default=True, action='store_true',
+                        help='Whether to take 1 slice at a time')
+    parser.add_argument('--compute_3d_distance_fields', dest='distance_fields_3d', default=True, action='store_true',
+                        help='Whether to compute distance fields to any voxel in the volume')
+    parser.add_argument('--compute_2d_distance_fields', dest='distance_fields_2d', default=True, action='store_true',
+                        help='Whether to compute distance fields to any pixel in the current slice')
+    parser.add_argument('--save_distance_field_images', dest='save_distance_field_images', default=True,
+                        action='store_true')
+    parser.add_argument('--in_res', default=512, type=int, help="Input resolution")
+    parser.add_argument('--out_res', default=256, type=int, help="Output resolution")
+    parser.add_argument('--input_dir', default="/home/georgm/Dropbox/Data/Projects/ANALYST/CHD_orig/", type=str,
+                        help="Input path for image data")
+    parser.add_argument('--mask_types', nargs='+', type=str, default=["BP", "MYO"], help="Mask types to process")
 
-config = parser.parse_args()
-config.output_dir = config.input_dir + f"output_{str(config.out_res)}/"
-config.val_test_train = {"train": config.train_idxs, "val": config.val_idxs, "test": config.test_idxs}
-config.resize = config.in_res != config.out_res
+    config = parser.parse_args(args)
+    config.output_dir = config.input_dir + f"output_{str(config.out_res)}/"
+    config.val_test_train = {"train": config.train_idxs, "val": config.val_idxs, "test": config.test_idxs}
+    config.resize = config.in_res != config.out_res
 
-if __name__ == '__main__':
+    return config
+
+
+def main(config):
     create_directories(config)
 
     for data_vol in config.val_test_train:
         data_vol_dir = config.output_dir + data_vol + "/"
-        
+
         image_id = 0
         mask_id = 0
         for vol_idx in config.val_test_train[data_vol]:
@@ -207,7 +211,7 @@ if __name__ == '__main__':
 
             for mask_type in config.mask_types:
                 print("Processing " + mask_type)
-                
+
                 # Redefine paths
                 mask_dir = data_vol_dir + mask_type + f"_masks_{config.out_res}/"
 
@@ -218,21 +222,21 @@ if __name__ == '__main__':
                 if config.distance_fields_3d:
                     _3d_distance_dir = data_vol_dir + mask_type + f"_3d_distances_{config.out_res}/"
                     _3d_distance_field_image_dir = data_vol_dir + mask_type + f"_3d_distance_images_{config.out_res}/"
-                
+
                 mask_id_tmp = mask_id
 
                 # Load mask
                 in_mask = config.input_dir + mask_type + "/" + mask_type + vol_idx_str + ".nii.gz"
                 mask_vol = nib.load(in_mask)
-               
-                # Prepare and compute distances 
+
+                # Prepare and compute distances
                 mask_array = mask_vol.get_fdata()
                 mask_array_tf = redefine_true_false_values(mask_array)
                 if config.distance_fields_3d:
                     distances_3d = array_to_distance_field(mask_array_tf)
                 if config.distance_fields_2d:
                     distances_2d = array_to_distance_field_slicewise(mask_array_tf)
-                
+
                 if config.resize:
                     mask_array = resize_3d_array_slicewise(mask_array, config.out_res, PIL.Image.NEAREST)
                     if config.distance_fields_3d:
@@ -242,10 +246,10 @@ if __name__ == '__main__':
 
                 # Prepare mask for output as 8-bit png
                 mask_array = np.uint8(mask_array * 255)
- 
+
                 # Iterate through slices and output images and distances
                 num_slices = mask_array.shape[2]
-                for j in range(1, num_slices-1):
+                for j in range(1, num_slices - 1):
                     # Output masks
                     mask = Image.fromarray(mask_array[:, :, j])
                     out_mask = mask_dir + f'{mask_id_tmp:010d}.png'
@@ -263,11 +267,11 @@ if __name__ == '__main__':
                         save_array_as_point_cloud_csv(distance_3d, _3d_distance_dir, mask_id_tmp)
                         if config.save_distance_field_images:
                             save_array_as_image(distance_3d, _3d_distance_field_image_dir, mask_id_tmp)
-        
+
                     # Increment id
                     mask_id_tmp += 1
-            
-            mask_id = mask_id_tmp 
+
+            mask_id = mask_id_tmp
 
             # Load image and convert to uint8
             in_img = config.input_dir + f"/IM52525/CTH0{vol_idx_str}_IMA.nii.gz"
@@ -277,12 +281,12 @@ if __name__ == '__main__':
             # Redefine paths
             im_3_slice_dir = data_vol_dir + f"images_3_slice_{config.out_res}/"
             im_dir = data_vol_dir + f"images_{config.out_res}/"
-            
+
             # Output images
             num_slices = img_vol.shape[2]
-            for j in range(1, num_slices-1):
+            for j in range(1, num_slices - 1):
                 if config.three_slice_images:
-                    img3 = Image.fromarray(img_vol[:, :, j-1:j+2])
+                    img3 = Image.fromarray(img_vol[:, :, j - 1:j + 2])
 
                     if config.resize:
                         img3 = img3.resize((config.out_res, config.out_res))
@@ -298,5 +302,10 @@ if __name__ == '__main__':
 
                     out_im = im_dir + f'{image_id:010d}.png'
                     img.save(out_im)
- 
+
                 image_id += 1
+
+
+if __name__ == '__main__':
+    config = parse_arguments()
+    main(config)
