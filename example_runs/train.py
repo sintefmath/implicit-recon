@@ -129,10 +129,10 @@ def parse_arguments(args=None):
     config.train_dir = config.base_data_dir / Path(config.sub_data_dir) / Path("train")
     config.val_dir = config.base_data_dir / Path(config.sub_data_dir) / Path("val")
     config.base_output_dir = Path(config.base_output_dir)
-    config.model_dir = config.base_output_dir / Path("ImplicitSpline/example_output/saved_models")
+    config.model_dir = config.base_output_dir / Path("example_output/saved_models")
 
     dtime = datetime.datetime.now().strftime('%b-%d-%y@%X')
-    config.log_dir = config.base_output_dir / Path("ImplicitSpline/example_output/logs") / config.title / dtime
+    config.log_dir = config.base_output_dir / Path("example_output/logs") / config.title / dtime
 
     return config
 
