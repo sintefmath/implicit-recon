@@ -1,3 +1,4 @@
+from pathlib import Path
 import skfmm
 import os
 import argparse
@@ -184,12 +185,12 @@ def parse_arguments(args=None):
     parser.add_argument('--save_distance_field_images', dest='save_distance_field_images', default=True,
                         action='store_true')
     parser.add_argument('--in_res', default=512, type=int, help="Input resolution")
-    parser.add_argument('--out_res', default=256, type=int, help="Output resolution")
-    parser.add_argument('--input_dir', default="/home/georgm/Dropbox/Data/Projects/ANALYST/CHD_orig/", type=str,
-                        help="Input path for image data")
+    parser.add_argument('--out_res', default=128, type=int, help="Output resolution")
+    parser.add_argument('--input_dir', default="./", type=str, help="Input path for image data")
     parser.add_argument('--mask_types', nargs='+', type=str, default=["BP", "MYO"], help="Mask types to process")
 
     config = parser.parse_args(args)
+
     config.output_dir = config.input_dir + f"output_{str(config.out_res)}/"
     config.val_test_train = {"train": config.train_idxs, "val": config.val_idxs, "test": config.test_idxs}
     config.resize = config.in_res != config.out_res
@@ -307,5 +308,6 @@ def main(config):
 
 
 if __name__ == '__main__':
+    # config = parse_arguments(['--input_dir', "/home/georgm/Dropbox/Data/Projects/ANALYST/CHD_orig/"])
     config = parse_arguments()
     main(config)

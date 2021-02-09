@@ -20,7 +20,7 @@ implicit-recon
 ```
 
 ## Requirements
-The code has the following dependencies:
+The code has been tested for Python 3.8. It has the following dependencies:
 `numpy`, `pillow`, `scikit-image`, `tqdm`, `torch`, `torchvision`, 
 `torchsummary`, `tensorboard`, `numpy-stl`
 
@@ -29,12 +29,16 @@ These can be installed (in your virtual environment) by running
     pip install -r requirements.txt
 
 ## Creating the data
-The Congenital Heart Disease CT data-set was kindly made available to us by 
+The Congenital Heart Disease (CHD) CT data-set was kindly made available to us by 
 Dr. Xiaowei Xu from the Department of Computer Science and Engineering,
 University of Notre Dame.
 
-Running the Python script `src/utilities/compute_distance_fields.py`
-splits this data-set into training, validation and test data (and optionally
+Suppose the root of the above directory tree is `BASE_DATA_DIR="CHD_orig/"`.
+Running, from the directory `src/utilities/`, the command
+```
+python compute_distance_fields.py --input_dir $BASE_DATA_DIR
+```
+splits the CHD CT data-set into training, validation and test data (and optionally
 computes distance fields) with input images in `images_1_slice_512` and
 segmented binary masks (labels) in `BP_masks_512`. This results in the 
 following directory tree, rooted at the CHD_orig directory:
@@ -71,7 +75,7 @@ In addition, the `src/utilities` directory contains:
 
 
 ## Example workflow
-Suppose our dataset is split the directory tree
+Suppose our dataset is split following the directory tree
 shown above, for which the root of the above directory tree is
 `BASE_DATA_DIR="CHD_orig/"` and its subdirectory is
 `SUB_DATA_DIR="output_512"`. As above, input images are stored in the
