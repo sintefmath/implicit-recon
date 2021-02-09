@@ -276,7 +276,7 @@ def main(config):
             mask_id = mask_id_tmp
 
             # Load image and convert to uint8
-            in_img = config.input_dir / f"/IM52525/CTH0{vol_idx_str}_IMA.nii.gz"
+            in_img = config.input_dir / f"IM52525/CTH0{vol_idx_str}_IMA.nii.gz"
             img_vol = nib.load(in_img).get_fdata()
             img_vol = np.uint8(np.clip(img_vol, 0, 2040) / 8)
 
